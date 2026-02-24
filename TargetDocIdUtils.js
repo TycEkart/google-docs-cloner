@@ -17,15 +17,16 @@ function setTargetDocId() {
         const targetDocId = result.getResponseText().trim();
         let documentName = retrieveTargetDocument(targetDocId).getName();
 
-        const acceptDocumentResult = ui.prompt(
+        const acceptDocumentResult = ui.alert(
             `Document Found: ${documentName}` ,
             'Would you like to save the target id?' +
             '\n\n' + targetDocId,
             ui.ButtonSet.OK_CANCEL
         );
 
-        if (acceptDocumentResult.getSelectedButton() === ui.Button.OK) {
+        if (acceptDocumentResult === ui.Button.OK) {
             PropertiesService.getScriptProperties().setProperty('TARGET_DOC_ID', targetDocId);
+            DocumentApp.getUi().showSidebar(html);
             logProgress(`User set target document id to ${targetDocId} pointing to ${documentName}`)
         }else{
             logProgress("User cancelled setting target document id.")
