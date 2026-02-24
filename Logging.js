@@ -8,11 +8,13 @@ function logProgress(msg) {
   cache.put('CLONER_LOGS', currentLogs, 21600);
 }
 
-function getLogs() {
-  return CacheService.getUserCache().get('CLONER_LOGS') || '';
+function clearLogs() {
+  CacheService.getUserCache().remove('CLONER_LOGS');
 }
 
-function showLogs() {
-  const htmlOutput = HtmlService.createHtmlOutputFromFile('Logger').setWidth(400).setHeight(300);
-  DocumentApp.getUi().showModelessDialog(htmlOutput, 'Cloner Progress');
+function showLogsSidebar() {
+  const htmlOutput = HtmlService
+      .createHtmlOutputFromFile('Logger')
+      .setTitle('Cloner Logs');
+  DocumentApp.getUi().showSidebar(htmlOutput);
 }

@@ -2,11 +2,10 @@
  * Clones the current tab of a document and sends it to a target document.
  * Due to bug with Google only the first tab can now be cloned. https://issuetracker.google.com/issues/465180332
  */
-function cloneWithOpenById() {
+function cloneDocument() {
     const ui = DocumentApp.getUi();
 
     try {
-        initializeLogs(ui);
         logProgress("--- Cloning Started ---");
         let sourceBody = retrieveSourceBody(ui);
 

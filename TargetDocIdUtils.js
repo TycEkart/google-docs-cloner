@@ -1,4 +1,4 @@
-function setTargetDocId() {
+function findDocument() {
     const ui = DocumentApp.getUi();
     const result = ui.prompt(
         'Set Target Document ID',
@@ -26,10 +26,9 @@ function setTargetDocId() {
 
         if (acceptDocumentResult === ui.Button.OK) {
             PropertiesService.getScriptProperties().setProperty('TARGET_DOC_ID', targetDocId);
-            DocumentApp.getUi().showSidebar(html);
-            logProgress(`User set target document id to ${targetDocId} pointing to ${documentName}`)
+            logProgress(`✅ User set target document id to ${targetDocId} pointing to ${documentName}`)
         }else{
-            logProgress("User cancelled setting target document id.")
+            logProgress("❌ User cancelled setting target document id.")
         }
     }
 }
