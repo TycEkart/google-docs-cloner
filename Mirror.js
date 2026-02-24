@@ -42,17 +42,36 @@ function mirrorWithOpenById() {
     let targetId = props.getProperty(propKey);
     let targetDoc;
 
+    if (targetId) {
+        let fileName = targetId; // Default to ID if name retrieval fails
+        try {
+            fileName = DriveApp.getFileById(targetId).getName();
+        } catch (e) {
+            logProgress(`Could not retrieve file name for ID ${targetId}. It may be invalid or you may lack permission.`);
+        }
+        const docUrl = `https://docs.google.com/document/d/${targetId}/`;
+        const message = `Use this target document?\n\nName: ${fileName}\n\n${docUrl}`;
+        const alertResponse = ui.alert('Use existing Target ID?', message, ui.ButtonSet.YES_NO_CANCEL);
+
+        if (alertResponse === ui.Button.NO) {
+            // User wants to enter a new ID
+            targetId = null; // Clear it so we prompt for a new one.
+        } else if (alertResponse !== ui.Button.YES) {
+            // User cancelled or closed the dialog
+            throw new Error('Sync cancelled by user.');
+        }
+    }
+
     if (!targetId) {
-      logProgress(`No target ID found for property: ${propKey}`);
-      const ui = DocumentApp.getUi();
-      const response = ui.prompt('Enter Target Document ID', `No target document is configured for the tab "${tabName}". Please enter the Google Doc ID to be used as the target.\n\n(This will be saved as the property '${propKey}')`, ui.ButtonSet.OK_CANCEL);
+      logProgress('Prompting for new Target ID.');
+      const promptResponse = ui.prompt('Enter Target Document ID', `Please enter the Google Doc ID to be used as the target.\n\n(This will be saved as the property '${propKey}')`, ui.ButtonSet.OK_CANCEL);
       
-      if (response.getSelectedButton() == ui.Button.OK && response.getResponseText()) {
-        targetId = response.getResponseText();
+      if (promptResponse.getSelectedButton() == ui.Button.OK && promptResponse.getResponseText()) {
+        targetId = promptResponse.getResponseText();
         props.setProperty(propKey, targetId);
         logProgress(`Saved new target ID: ${targetId}`);
       } else {
-        throw new Error(`No target document ID configured. Please set the property '${propKey}'.`);
+        throw new Error(`No target document ID configured or sync cancelled. Please set the property '${propKey}'.`);
       }
     }
 
@@ -143,6 +162,15 @@ function mirrorWithOpenById() {
       else if (type == DocumentApp.ElementType.TABLE) targetBody.appendTable(child);
       else if (type == DocumentApp.ElementType.LIST_ITEM) targetBody.appendListItem(child);
       else if (type == DocumentApp.ElementType.PAGE_BREAK) targetBody.appendPageBreak(child);
+    }
+
+    logProgress("Deleting first paragraph from target document.");
+    if (targetBody.getNumChildren() > 0) {
+        const firstChild = targetBody.getChild(0);
+        if (firstChild.getType() === DocumentApp.ElementType.PARAGRAPH) {
+            firstChild.removeFromParent();
+            logProgress("First paragraph deleted.");
+        }
     }
 
     logProgress("--- Sync Complete ---");
