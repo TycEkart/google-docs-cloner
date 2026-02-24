@@ -1,7 +1,7 @@
 function onOpen() {
   DocumentApp.getUi()
     .createMenu('Cloner Tools')
-    .addItem('Clone Document', 'mirrorWithOpenById')
+    .addItem('Clone Document', 'cloneWithOpenById')
     .addItem('Show Logs', 'showLogs')
     .addItem('Set Target Doc ID', 'setTargetDocId')
     .addToUi();
