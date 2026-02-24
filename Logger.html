@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: 'Courier New', monospace; font-size: 12px; padding: 10px; color: #333; }
+      #log-container { white-space: pre-wrap; word-wrap: break-word; }
+      .status-line { margin-bottom: 4px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
+    </style>
+  </head>
+  <body>
+    <div id="log-container">Starting...</div>
+    <script>
+      // Poll the server every 1 second for new logs
+      setInterval(function() {
+        google.script.run.withSuccessHandler(function(logs) {
+          const container = document.getElementById('log-container');
+          if (logs && container.innerHTML !== logs) {
+            container.innerHTML = logs;
+            window.scrollTo(0, document.body.scrollHeight);
+          }
+        }).getLogs();
+      }, 1000);
+    </script>
+  </body>
+</html>
