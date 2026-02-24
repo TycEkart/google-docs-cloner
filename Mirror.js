@@ -111,8 +111,33 @@ function mirrorWithOpenById() {
     const numChildren = sourceBody.getNumChildren();
     logProgress(`Found ${numChildren} elements to copy.`);
     for (let i = 0; i < numChildren; i++) {
-      let child = sourceBody.getChild(i).copy();
-      let type = child.getType();
+      let sourceChild = sourceBody.getChild(i);
+      let type = sourceChild.getType();
+      let estimatedBytes = 0;
+
+      if (type === DocumentApp.ElementType.PARAGRAPH) {
+        const p = sourceChild.asParagraph();
+        estimatedBytes = p.getText().length;
+        for (let j = 0; j < p.getNumChildren(); j++) {
+          if (p.getChild(j).getType() === DocumentApp.ElementType.INLINE_IMAGE) {
+            estimatedBytes += p.getChild(j).asInlineImage().getBlob().getBytes().length;
+          }
+        }
+      } else if (type === DocumentApp.ElementType.TABLE) {
+        estimatedBytes = sourceChild.asTable().getText().length; // Note: This doesn't account for images in tables.
+      } else if (type === DocumentApp.ElementType.LIST_ITEM) {
+        const li = sourceChild.asListItem();
+        estimatedBytes = li.getText().length;
+        for (let j = 0; j < li.getNumChildren(); j++) {
+          if (li.getChild(j).getType() === DocumentApp.ElementType.INLINE_IMAGE) {
+            estimatedBytes += li.getChild(j).asInlineImage().getBlob().getBytes().length;
+          }
+        }
+      }
+
+      logProgress(`  -> child ${i+1} of ${numChildren} is a ${type} with an estimated size of ${estimatedBytes} bytes`);
+
+      let child = sourceChild.copy();
 
       if (type == DocumentApp.ElementType.PARAGRAPH) targetBody.appendParagraph(child);
       else if (type == DocumentApp.ElementType.TABLE) targetBody.appendTable(child);
