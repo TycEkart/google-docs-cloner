@@ -8,6 +8,11 @@ function logProgress(msg) {
   cache.put('CLONER_LOGS', currentLogs, 21600);
 }
 
+// noinspection JSUnusedGlobalSymbols used in Logger.html
+function getLogs() {
+  return CacheService.getUserCache().get('CLONER_LOGS') || '';
+}
+
 function clearLogs() {
   CacheService.getUserCache().remove('CLONER_LOGS');
 }

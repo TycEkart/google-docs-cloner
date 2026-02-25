@@ -8,6 +8,7 @@ function onOpen() {
         .addToUi();
 }
 
+// noinspection JSUnusedGlobalSymbols used by Google Apps Framework
 function onInstall(e) {
     onOpen(e);
 }
